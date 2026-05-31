@@ -9,25 +9,13 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->ensureCanManageUsers();
-
-            return $next($request);
-        });
-    }
-
     public function index(Request $request)
     {
         $users = User::orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
         $editUser = null;
         if ($editId = $request->query('edit') ?? session('edit_user_id')) {
-            $candidate = User::find($editId);
-            if ($candidate && auth()->user()->canEditUser($candidate)) {
-                $editUser = $candidate;
-            }
+            $editUser = User::find($editId);
         }
 
         return view('users.index', compact('users', 'editUser'));
@@ -66,15 +54,11 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $this->ensureCanEditUser($user);
-
         return redirect()->route('users.index', ['edit' => $user->id]);
     }
 
     public function update(Request $request, User $user)
     {
-        $this->ensureCanEditUser($user);
-
         $validator = Validator::make($request->all(), $this->userRules($user));
 
         if ($validator->fails()) {
@@ -103,7 +87,9 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        $this->ensureCanDeleteUser($user);
+        if (auth()->id() === $user->id) {
+            abort(403, 'You cannot delete your own account.');
+        }
 
         $user->delete();
 
@@ -135,14 +121,9 @@ class UserController extends Controller
 
     protected function resolvedRole(Request $request, ?User $user = null): string
     {
-        $actor = auth()->user();
-        $allowedRoles = array_keys(User::assignableRolesFor($actor, $user));
+        $allowedRoles = array_keys(User::assignableRolesFor(auth()->user(), $user));
 
-        if ($actor?->isAdmin()) {
-            return User::ROLE_STAFF;
-        }
-
-        if ($actor?->canManageRoles() && $allowedRoles !== [] && $request->filled('role')) {
+        if ($allowedRoles !== [] && $request->filled('role')) {
             return $request->role;
         }
 

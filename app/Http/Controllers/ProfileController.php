@@ -9,15 +9,6 @@ use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->ensureCanEditProfile();
-
-            return $next($request);
-        });
-    }
-
     public function edit()
     {
         return view('profile', ['user' => Auth::user()]);

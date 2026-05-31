@@ -30,21 +30,19 @@
                 <option>All Customers</option>
             </select>
 
-            @if(auth()->user()->canCreateCustomers())
-                <button
-                    type="button"
-                    class="toolbar-add-btn"
-                    data-bs-toggle="modal"
-                    data-bs-target="#addCustomerModal"
-                    aria-controls="addCustomerModal"
-                    title="Add customer"
-                    aria-label="Add customer"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                    </svg>
-                </button>
-            @endif
+            <button
+                type="button"
+                class="toolbar-add-btn"
+                data-bs-toggle="modal"
+                data-bs-target="#addCustomerModal"
+                aria-controls="addCustomerModal"
+                title="Add customer"
+                aria-label="Add customer"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+            </button>
         </form>
     </div>
 
@@ -94,9 +92,9 @@
                         </td>
                         <td class="text-end">
                             <x-kebab-actions
-                                :edit-url="auth()->user()->canEditCustomers() ? route('customers.edit', $customer) : null"
+                                :edit-url="route('customers.edit', $customer)"
                                 :delete-url="route('customers.destroy', $customer)"
-                                :can-delete="auth()->user()->canDelete()"
+                                :can-delete="true"
                                 delete-confirm="Delete this customer?"
                             />
                         </td>

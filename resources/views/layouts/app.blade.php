@@ -1211,14 +1211,10 @@
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li>
-                @if(auth()->user()?->canManageUsers())
-                    <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">Users</a></li>
-                @endif
+                <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">Users</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('customers.index') }}">Customers</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('records.index') }}">Records</a></li>
-                @if(auth()->user()?->canEditProfile())
-                    <li class="nav-item"><a class="nav-link" href="{{ route('profile.edit') }}">Profile</a></li>
-                @endif
+                <li class="nav-item"><a class="nav-link" href="{{ route('profile.edit') }}">Profile</a></li>
             </ul>
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><span class="navbar-text text-white me-3">{{ auth()->user()->name }}</span></li>
@@ -1305,18 +1301,14 @@
                 </div>
             </div>
 
-            @if(auth()->user()?->canManageUsers())
-                <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                    <span class="nav-link-icon">&#x1F465;</span>
-                    <span class="nav-link-text">Users</span>
-                </a>
-            @endif
-            @if(auth()->user()?->canEditProfile())
-                <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
-                    <span class="nav-link-icon">&#x2699;&#xFE0F;</span>
-                    <span class="nav-link-text">Profile</span>
-                </a>
-            @endif
+            <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                <span class="nav-link-icon">&#x1F465;</span>
+                <span class="nav-link-text">Users</span>
+            </a>
+            <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                <span class="nav-link-icon">&#x2699;&#xFE0F;</span>
+                <span class="nav-link-text">Profile</span>
+            </a>
         </nav>
 
         <div class="sidebar-footer">

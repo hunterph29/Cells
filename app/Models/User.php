@@ -63,9 +63,18 @@ class User extends Authenticatable
         return $this->hasMany(Record::class);
     }
 
+    public function hasDashboardAccess(): bool
+    {
+        return in_array($this->role, [
+            self::ROLE_SUPER_ADMIN,
+            self::ROLE_ADMIN,
+            self::ROLE_STAFF,
+        ], true);
+    }
+
     public function canDelete(): bool
     {
-        return in_array($this->role, [self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN], true);
+        return $this->hasDashboardAccess();
     }
 
     public function isSuperAdmin(): bool
@@ -85,17 +94,17 @@ class User extends Authenticatable
 
     public function canManageRoles(): bool
     {
-        return $this->canDelete();
+        return $this->hasDashboardAccess();
     }
 
     public function canManageUsers(): bool
     {
-        return $this->canDelete();
+        return $this->hasDashboardAccess();
     }
 
     public function canEditProfile(): bool
     {
-        return true;
+        return $this->hasDashboardAccess();
     }
 
     public function roleLabel(): string
@@ -110,75 +119,34 @@ class User extends Authenticatable
 
     public function canEditUser(User $target): bool
     {
-        if ($this->isStaff() || ! $this->canManageUsers()) {
-            return false;
-        }
-
-        if ($this->isSuperAdmin()) {
-            return true;
-        }
-
-        return $this->isAdmin() && $target->isStaff();
+        return $this->hasDashboardAccess();
     }
 
     public function canDeleteUser(User $target): bool
     {
-        if ($this->id === $target->id || ! $this->canDelete()) {
-            return false;
-        }
-
-        if ($this->isSuperAdmin()) {
-            return $target->isAdmin() || $target->isStaff();
-        }
-
-        return $this->isAdmin() && $target->isStaff();
+        return $this->hasDashboardAccess() && $this->id !== $target->id;
     }
 
     public function canCreateCustomers(): bool
     {
-        return $this->canEditCustomers();
+        return $this->hasDashboardAccess();
     }
 
     public function canEditCustomers(): bool
     {
-        return in_array($this->role, [
-            self::ROLE_SUPER_ADMIN,
-            self::ROLE_ADMIN,
-            self::ROLE_STAFF,
-        ], true);
+        return $this->hasDashboardAccess();
     }
 
     public static function assignableRolesFor(?User $actor, ?User $target = null): array
     {
-        if ($actor?->isSuperAdmin()) {
-            if ($target?->isSuperAdmin()) {
-                return [
-                    self::ROLE_SUPER_ADMIN => 'Super admin',
-                    self::ROLE_ADMIN => 'Admin',
-                    self::ROLE_STAFF => 'Staff',
-                ];
-            }
-
-            if ($target?->isAdmin()) {
-                return [
-                    self::ROLE_ADMIN => 'Admin',
-                    self::ROLE_STAFF => 'Staff',
-                ];
-            }
-
-            return [
-                self::ROLE_SUPER_ADMIN => 'Super admin',
-                self::ROLE_ADMIN => 'Admin',
-                self::ROLE_STAFF => 'Staff',
-            ];
+        if (! $actor?->hasDashboardAccess()) {
+            return [];
         }
 
-        if ($actor?->isAdmin() && (! $target || $target->isStaff())) {
-            return [
-                self::ROLE_STAFF => 'Staff',
-            ];
-        }
-
-        return [];
+        return [
+            self::ROLE_SUPER_ADMIN => 'Super admin',
+            self::ROLE_ADMIN => 'Admin',
+            self::ROLE_STAFF => 'Staff',
+        ];
     }
 }

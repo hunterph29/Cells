@@ -51,7 +51,7 @@
                                 <x-kebab-actions
                                     :edit-url="route('records.edit', $record)"
                                     :delete-url="route('records.destroy', $record)"
-                                    :can-delete="auth()->user()->canDelete()"
+                                    :can-delete="true"
                                     delete-confirm="Delete this record?"
                                 />
                             </td>

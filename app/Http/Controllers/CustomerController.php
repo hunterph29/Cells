@@ -37,8 +37,6 @@ class CustomerController extends Controller
 
     public function create()
     {
-        $this->ensureCanCreateCustomers();
-
         return redirect()
             ->route('customers.index')
             ->with('open_customer_modal', 'add');
@@ -46,8 +44,6 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
-        $this->ensureCanCreateCustomers();
-
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:customers',
@@ -73,15 +69,11 @@ class CustomerController extends Controller
 
     public function edit(Customer $customer)
     {
-        $this->ensureCanEditCustomers();
-
         return redirect()->route('customers.index', ['edit' => $customer->id]);
     }
 
     public function update(Request $request, Customer $customer)
     {
-        $this->ensureCanEditCustomers();
-
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:customers,email,' . $customer->id,
@@ -108,8 +100,6 @@ class CustomerController extends Controller
 
     public function destroy(Customer $customer)
     {
-        $this->ensureCanDelete();
-
         $customer->delete();
 
         return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');

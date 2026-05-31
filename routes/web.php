@@ -22,20 +22,16 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::middleware('admin')->group(function () {
-        Route::resource('users', UserController::class)->except(['show']);
-    });
+    Route::resource('users', UserController::class)->except(['show']);
 
     Route::resource('customers', CustomerController::class)->except(['show']);
 
     Route::resource('records', RecordController::class)->except(['show']);
 
-    Route::middleware('profile.edit')->group(function () {
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::put('/profile/account', [ProfileController::class, 'updateAccount'])->name('profile.account.update');
-        Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
-    });
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/account', [ProfileController::class, 'updateAccount'])->name('profile.account.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

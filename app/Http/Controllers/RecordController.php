@@ -4,18 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Record;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class RecordController extends Controller
 {
     public function index(Request $request)
     {
-        $records = Auth::user()->records()->latest()->paginate(10)->withQueryString();
+        $records = Record::latest()->paginate(10)->withQueryString();
 
         $editRecord = null;
         if ($editId = $request->query('edit') ?? session('edit_record_id')) {
-            $editRecord = Auth::user()->records()->find($editId);
+            $editRecord = Record::find($editId);
         }
 
         return view('records.index', compact('records', 'editRecord'));
@@ -43,22 +42,21 @@ class RecordController extends Controller
                 ->with('open_record_modal', 'add');
         }
 
-        Auth::user()->records()->create($validator->validated());
+        Record::create([
+            ...$validator->validated(),
+            'user_id' => auth()->id(),
+        ]);
 
         return redirect()->route('records.index')->with('success', 'Record added successfully.');
     }
 
     public function edit(Record $record)
     {
-        $this->authorizeRecord($record);
-
         return redirect()->route('records.index', ['edit' => $record->id]);
     }
 
     public function update(Request $request, Record $record)
     {
-        $this->authorizeRecord($record);
-
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
@@ -80,17 +78,8 @@ class RecordController extends Controller
 
     public function destroy(Record $record)
     {
-        $this->authorizeRecord($record);
-        $this->ensureCanDelete();
         $record->delete();
 
         return redirect()->route('records.index')->with('success', 'Record deleted successfully.');
-    }
-
-    protected function authorizeRecord(Record $record)
-    {
-        if ($record->user_id !== Auth::id()) {
-            abort(403);
-        }
     }
 }

@@ -1,7 +1,7 @@
 @php
     use App\Models\User;
 
-    $addTitle = auth()->user()->isAdmin() ? 'Add Staff' : 'Add User';
+    $addTitle = 'Add User';
 @endphp
 
 <x-classroom-modal
