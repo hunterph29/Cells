@@ -94,7 +94,7 @@
                         </td>
                         <td class="text-end">
                             <x-kebab-actions
-                                :edit-url="route('customers.edit', $customer)"
+                                :edit-url="auth()->user()->canEditCustomers() ? route('customers.edit', $customer) : null"
                                 :delete-url="route('customers.destroy', $customer)"
                                 :can-delete="auth()->user()->canDelete()"
                                 delete-confirm="Delete this customer?"

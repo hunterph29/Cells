@@ -73,11 +73,15 @@ class CustomerController extends Controller
 
     public function edit(Customer $customer)
     {
+        $this->ensureCanEditCustomers();
+
         return redirect()->route('customers.index', ['edit' => $customer->id]);
     }
 
     public function update(Request $request, Customer $customer)
     {
+        $this->ensureCanEditCustomers();
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:customers,email,' . $customer->id,

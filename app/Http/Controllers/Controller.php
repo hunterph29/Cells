@@ -51,4 +51,11 @@ class Controller extends BaseController
             abort(403, 'You do not have permission to add customers.');
         }
     }
+
+    protected function ensureCanEditCustomers(): void
+    {
+        if (! auth()->user()?->canEditCustomers()) {
+            abort(403, 'You do not have permission to edit customers.');
+        }
+    }
 }

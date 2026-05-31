@@ -95,7 +95,7 @@ class User extends Authenticatable
 
     public function canEditProfile(): bool
     {
-        return $this->canDelete();
+        return true;
     }
 
     public function roleLabel(): string
@@ -136,12 +136,16 @@ class User extends Authenticatable
 
     public function canCreateCustomers(): bool
     {
-        return ! $this->isStaff();
+        return $this->canEditCustomers();
     }
 
     public function canEditCustomers(): bool
     {
-        return true;
+        return in_array($this->role, [
+            self::ROLE_SUPER_ADMIN,
+            self::ROLE_ADMIN,
+            self::ROLE_STAFF,
+        ], true);
     }
 
     public static function assignableRolesFor(?User $actor, ?User $target = null): array
