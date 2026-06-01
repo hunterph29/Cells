@@ -779,9 +779,13 @@
         .profile-password-toggle.is-visible .profile-eye-icon {
             opacity: 0.55;
         }
+        .profile-picture-section,
         .profile-account-section,
         .profile-password-section {
             padding-top: 0.25rem;
+        }
+        .profile-picture-form .profile-account-picture {
+            margin-bottom: 1.25rem;
         }
         .dashboard-main .table-card {
             background: #ffffff;

@@ -16,24 +16,14 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        $user = Auth::user();
-
         $request->validate([
-            'profile_picture' => 'nullable|image|max:2048',
+            'profile_picture' => 'required|image|max:2048',
         ]);
 
-        if (!$request->hasFile('profile_picture')) {
-            return back();
-        }
-
-        $file = $request->file('profile_picture');
-        $filename = time() . '_' . preg_replace('/[^A-Za-z0-9\.\-]/', '_', $file->getClientOriginalName());
-        $destination = public_path('profile_pictures');
-        if (!file_exists($destination)) {
-            mkdir($destination, 0755, true);
-        }
-        $file->move($destination, $filename);
-        $user->update(['profile_picture' => 'profile_pictures/' . $filename]);
+        $user = Auth::user();
+        $user->update([
+            'profile_picture' => $this->storeProfilePicture($request->file('profile_picture')),
+        ]);
         Auth::setUser($user->fresh());
 
         return back()->with('success', 'Profile picture updated successfully.');
@@ -57,7 +47,6 @@ class ProfileController extends Controller
             'phone' => 'nullable|string|max:50',
             'birthdate' => 'nullable|date|before:today',
             'country' => 'nullable|string|max:255',
-            'profile_picture' => 'nullable|image|max:2048',
         ]);
 
         $firstName = $request->first_name;
@@ -74,17 +63,6 @@ class ProfileController extends Controller
             'birthdate' => $request->birthdate,
             'country' => $request->country,
         ];
-
-        if ($request->hasFile('profile_picture')) {
-            $file = $request->file('profile_picture');
-            $filename = time() . '_' . preg_replace('/[^A-Za-z0-9\.\-]/', '_', $file->getClientOriginalName());
-            $destination = public_path('profile_pictures');
-            if (!file_exists($destination)) {
-                mkdir($destination, 0755, true);
-            }
-            $file->move($destination, $filename);
-            $data['profile_picture'] = 'profile_pictures/' . $filename;
-        }
 
         $user->update($data);
 
@@ -103,5 +81,17 @@ class ProfileController extends Controller
         $user->update(['password' => Hash::make($request->password)]);
 
         return back()->with('success', 'Password updated successfully.');
+    }
+
+    protected function storeProfilePicture($file): string
+    {
+        $filename = time() . '_' . preg_replace('/[^A-Za-z0-9\.\-]/', '_', $file->getClientOriginalName());
+        $destination = public_path('profile_pictures');
+        if (! file_exists($destination)) {
+            mkdir($destination, 0755, true);
+        }
+        $file->move($destination, $filename);
+
+        return 'profile_pictures/' . $filename;
     }
 }

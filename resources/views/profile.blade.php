@@ -38,18 +38,53 @@
     <div class="table-card p-4 profile-page-card">
         <div class="row justify-content-center">
             <div class="col-xl-10">
-                {{-- Account section --}}
-                <section class="profile-account-section mb-5">
-                    <h2 class="profile-section-title">Account</h2>
-                    <form method="POST" action="{{ route('profile.account.update') }}" enctype="multipart/form-data" class="profile-account-form">
+                {{-- Profile picture (saved independently) --}}
+                <section class="profile-picture-section mb-5">
+                    <h2 class="profile-section-title">Profile Picture</h2>
+                    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="profile-picture-form">
                         @csrf
                         @method('PUT')
 
                         <div class="profile-account-picture">
-                            <label class="profile-field-label">Profile Picture</label>
-                            <input type="file" name="profile_picture" class="form-control profile-field-input @error('profile_picture') is-invalid @enderror" accept="image/*">
+                            <div class="profile-avatar-wrap mb-3" id="profilePicturePreviewWrap">
+                                @if($user->profile_picture)
+                                    <img
+                                        src="{{ asset($user->profile_picture) }}"
+                                        alt="{{ $user->name }}"
+                                        class="user-avatar-img"
+                                        id="profilePicturePreview"
+                                        style="width: 96px; height: 96px;"
+                                    >
+                                @else
+                                    <span
+                                        class="user-avatar-fallback"
+                                        id="profilePicturePreview"
+                                        style="width: 96px; height: 96px; font-size: 36px;"
+                                        aria-hidden="true"
+                                    >{{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}</span>
+                                @endif
+                            </div>
+                            <label class="profile-field-label" for="profile_picture">Choose image</label>
+                            <input
+                                type="file"
+                                name="profile_picture"
+                                id="profile_picture"
+                                class="form-control profile-field-input @error('profile_picture') is-invalid @enderror"
+                                accept="image/*"
+                                required
+                            >
                             @error('profile_picture')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         </div>
+                        <button type="submit" class="btn profile-btn-dark">Update Profile Picture</button>
+                    </form>
+                </section>
+
+                {{-- Account section --}}
+                <section class="profile-account-section mb-5">
+                    <h2 class="profile-section-title">Account</h2>
+                    <form method="POST" action="{{ route('profile.account.update') }}" class="profile-account-form">
+                        @csrf
+                        @method('PUT')
 
                         <div class="row g-4">
                             <div class="col-md-6">
@@ -183,6 +218,32 @@
         birthdateInput.addEventListener('change', updateAge);
         birthdateInput.addEventListener('input', updateAge);
         updateAge();
+    }
+
+    var pictureInput = document.getElementById('profile_picture');
+    var picturePreviewWrap = document.getElementById('profilePicturePreviewWrap');
+    if (pictureInput && picturePreviewWrap) {
+        pictureInput.addEventListener('change', function () {
+            var file = pictureInput.files && pictureInput.files[0];
+            if (!file || !file.type.startsWith('image/')) {
+                return;
+            }
+            var preview = document.getElementById('profilePicturePreview');
+            var url = URL.createObjectURL(file);
+            if (preview && preview.tagName === 'IMG') {
+                preview.src = url;
+            } else {
+                var img = document.createElement('img');
+                img.id = 'profilePicturePreview';
+                img.src = url;
+                img.alt = 'Profile picture preview';
+                img.className = 'user-avatar-img';
+                img.style.width = '96px';
+                img.style.height = '96px';
+                picturePreviewWrap.innerHTML = '';
+                picturePreviewWrap.appendChild(img);
+            }
+        });
     }
 
     document.querySelectorAll('.profile-password-toggle').forEach(function (btn) {
