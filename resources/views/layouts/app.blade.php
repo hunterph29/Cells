@@ -15,8 +15,38 @@
         .auth-card { width: 100%; max-width: 420px; border-radius: 30px; background: rgba(255,255,255,.98); box-shadow: 0 30px 60px rgba(0,0,0,.14); padding: 2rem; margin: 2rem; box-sizing: border-box; }
         .auth-icon { width: 100px; height: 100px; border-radius: 50%; background: #ffffff; display: grid; place-items: center; margin: 0 auto 1.25rem; box-shadow: 0 15px 40px rgba(0,0,0,.12); }
         .auth-icon svg { width: 42px; height: 42px; }
-        .auth-input { border-radius: 999px; padding-left: 3rem; }
-        .input-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #d63384; pointer-events: none; }
+        .auth-input-wrap {
+            position: relative;
+        }
+        .auth-input {
+            border-radius: 999px;
+            padding-left: 3rem;
+            min-height: 48px;
+        }
+        .auth-input.is-invalid {
+            padding-right: 2.75rem;
+            background-position: right 1rem center;
+        }
+        .auth-input-wrap .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #d63384;
+            pointer-events: none;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1rem;
+            height: 1rem;
+            line-height: 1;
+        }
+        .auth-field .invalid-feedback {
+            display: block;
+            margin: 0.4rem 0 0 1rem;
+            font-size: 0.875rem;
+        }
         .auth-footer a { color: #d63384; text-decoration: none; }
         .auth-footer a:hover { text-decoration: underline; }
         @media (max-width: 576px) {
